@@ -18,7 +18,6 @@ public class Warehouse {
         return new Warehouse("Default");
     }
 
-
     public static Warehouse getInstance(String name) {
         if (instances.containsKey(name)) {
             return instances.get(name);
