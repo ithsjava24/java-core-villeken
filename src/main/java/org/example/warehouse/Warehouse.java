@@ -21,7 +21,7 @@ public class Warehouse {
 
     public static Warehouse getInstance(String name) {
         if (instances.containsKey(name)) {
-            return (Warehouse) instances.get(name);
+            return instances.get(name);
         } else {
             Warehouse warehouse = new Warehouse(name);
             instances.put(name, warehouse);
@@ -34,7 +34,7 @@ public class Warehouse {
     }
 
     public List<ProductRecord> getProducts() {
-        return productRecords;
+        return Collections.unmodifiableList(productRecords);
     }
 
     public List<ProductRecord> getChangedProducts() {
@@ -42,9 +42,9 @@ public class Warehouse {
     }
 
     public Optional<ProductRecord> getProductById(UUID uuid) {
-        List<ProductRecord> filteredProducts = productRecords.stream().filter(product -> product.uuid().equals(uuid)).toList();
-        if (filteredProducts.isEmpty()) return Optional.empty();
-        return Optional.of(filteredProducts.getFirst());
+        return productRecords.stream()
+                .filter(product -> product.uuid().equals(uuid))
+                .findFirst();
     }
 
 
@@ -59,6 +59,7 @@ public class Warehouse {
             if (categoryName == null) {
                 throw new IllegalArgumentException("Category can't be null.");
             }
+
         }
         var product = new ProductRecord(UUID_value, name, categoryName, bigDecimal);
         productRecords.add(product);
@@ -66,10 +67,17 @@ public class Warehouse {
     }
 
     public void updateProductPrice(UUID uuid, BigDecimal bigDecimal) {
+        boolean found = false;
         for (ProductRecord productRecord : productRecords) {
             if (productRecord.uuid().equals(uuid)) {
-
+                productRecord.setPrice(bigDecimal);
+                changedProductRecords.add(productRecord);
+                found = true;
+                break;
             }
+        }
+        if (!found) {
+            throw new IllegalArgumentException("Product with that id doesn't exist.");
         }
     }
 

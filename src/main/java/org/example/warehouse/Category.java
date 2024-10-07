@@ -17,15 +17,10 @@ public class Category {
         this.categoryName = categoryName.substring(0, 1).toUpperCase().concat(categoryName.substring(1));
     }
 
-    public static Category of(String categoryName) {
-        if (instances.containsKey(categoryName)) {
-            return instances.get(categoryName);
-        } else {
-            Category category = new Category(categoryName);
-            instances.put(categoryName, category);
-            return category;
-        }
+    public static Category of(String name) {
+        return instances.computeIfAbsent(name, Category::new);
     }
+
 
     public String getName() {
         return categoryName;
